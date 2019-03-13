@@ -19,9 +19,18 @@
 
 <ul>
 
-<% for(let keys in urls) { %>
-    <li> <strong> <%= keys + ':' %> </strong> <%= urls[keys] %></li>
+      <% for(let keys in urls) { %>
+      <form method="POST" action="/urls/<%=keys%>/delete">
+    <li> <strong> <%= keys + ':' %> </strong> <%= urls[keys] %>
+    <button type="submit" class="btn btn-primary">Delete</button> </li>
+    </form>
 <% }; %>
+
+
+
+
+
+
 
 </ul>
 </body>
