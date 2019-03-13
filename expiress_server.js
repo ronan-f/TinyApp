@@ -2,10 +2,17 @@ var express = require("express");
 var app = express();
 var PORT = 8080;
 const bodyParser = require("body-parser");
+var cookieParser = require('cookie-parser')
 
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
+
+app.use((req, res, next) => {
+  app.locals.username = req.cookies.username;
+  next();
+})
 
 function randomStr() {
   var random = '';
@@ -16,6 +23,7 @@ function randomStr() {
 
   return random;
 }
+
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -72,6 +80,17 @@ app.post("/urls/:id", (req, res) => {
   urlDatabase[req.params.id] = req.body.update;
   res.redirect("/urls");
 });
+
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect("/urls");
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie('username', req.body.username);
+  res.redirect("/urls");
+})
+
 
 app.listen(PORT, () => {
 });
