@@ -22,6 +22,7 @@
       <% for(let keys in urls) { %>
       <form method="POST" action="/urls/<%=keys%>/delete">
     <li> <strong> <%= keys + ':' %> </strong> <%= urls[keys] %>
+    <a href="/urls/<%=keys%>">Edit</a>
     <button type="submit" class="btn btn-primary">Delete</button> </li>
     </form>
 <% }; %>

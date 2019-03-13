@@ -30,7 +30,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/urls");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -67,8 +67,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+app.post("/urls/:id", (req, res) => {
+  console.log(req.params);
+  urlDatabase[req.params.id] = req.body.update;
+  res.redirect("/urls");
+});
+
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
 });
 
 
