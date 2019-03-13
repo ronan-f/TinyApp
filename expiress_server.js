@@ -1,8 +1,8 @@
-var express = require("express");
-var app = express();
-var PORT = 8080;
+const express = require("express");
+const app = express();
+const PORT = 8080;
 const bodyParser = require("body-parser");
-var cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser')
 
 
 app.set("view engine", "ejs");
@@ -15,17 +15,17 @@ app.use((req, res, next) => {
 })
 
 function randomStr() {
-  var random = '';
-  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const random = '';
+  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-  for (var i = 0; i < 6; i++)
+  for (const i = 0; i < 6; i++)
     random += possible.charAt(Math.floor(Math.random() * possible.length));
 
   return random;
 }
 
 
-var urlDatabase = {
+const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
@@ -89,6 +89,10 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie('username', req.body.username);
   res.redirect("/urls");
+})
+
+app.get("/register", (req, res) => {
+  res.render("register");
 })
 
 
