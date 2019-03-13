@@ -12,11 +12,10 @@ function randomStr() {
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
   for (var i = 0; i < 6; i++)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
+    random += possible.charAt(Math.floor(Math.random() * possible.length));
 
   return random;
 }
-
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -53,11 +52,16 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);
-  res.send("Ok");
+  let short = randomStr();
+  urlDatabase[short] = req.body.longURL;
+  res.redirect('/urls/' + short);
 });
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+
+
+
 
