@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Register</title>
+  <title>Login</title>
     <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -11,12 +11,12 @@
 <body style="font-size:20px; padding:50px;">
   <% include ./partials/_header.ejs %>
   <h1>Tiny App</h1>
-    <form method="POST" action="/register">
+    <form method="POST" action="/login">
       <label for="mail">E-mail:</label>
       <input type='email' name='email'>
       <label for="password">Password:</label>
       <input type='password' name='password'>
-      <button type="submit" class="btn btn-primary">Submit</button> </li>
+      <button type="submit" class="btn btn-primary">Login</button> </li>
     </form>
 </body>
 </html>
