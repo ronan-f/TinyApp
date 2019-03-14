@@ -44,7 +44,6 @@ const users = {
 
 function emailCheck(input){
   for(id in users){
-    console.log('This is a test: ' , users['id']);
   if(users[id]['email'] === input){
     return true;
     }
@@ -114,20 +113,17 @@ app.post("/logout", (req, res) => {
 })
 
 app.get("/register", (req, res) => {
-  console.log('We are in get /register');
   res.render("register");
 })
 
 app.post("/register", (req, res) => {
 
-  console.log('We are in post /register');
 
   const randomID = randomStr();
   const email = req.body.email;
   const password = req.body.password;
 
   const emailFunc = emailCheck(email);
-  console.log('Email check: ' + emailFunc);
 
   if(emailCheck(email)){
     res.status(400);
