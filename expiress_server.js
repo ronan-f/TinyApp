@@ -113,10 +113,6 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-<<<<<<< HEAD
-  console.log('post / login')
-  res.cookie('username', req.body.username);
-=======
   const email = req.body.email;
   const password = req.body.password;
   const id = req.cookies.id;
@@ -130,19 +126,13 @@ if(!emailCheck(email)){
   res.send('Error 403 - Incorrect Password');
 } else {
   res.cookie('id', users[user].id);
->>>>>>> register
   res.redirect("/urls");
   }
 });
 
 app.post("/logout", (req, res) => {
-<<<<<<< HEAD
-  console.log("logout")
-  res.clearCookie('username', req.body.username);
-=======
   const id = req.cookies.id;
   res.clearCookie('id', users[id].id);
->>>>>>> register
   res.redirect("/urls");
 });
 
