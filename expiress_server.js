@@ -127,13 +127,13 @@ app.post("/register", (req, res) => {
 
   if(emailCheck(email)){
     res.status(400);
-    res.send('Email is already registered');
+    res.send('Error 400 - Email is already registered');
 
   }
 
    else if(email === '' || password === ''){
     res.status(400);
-    res.send('ANything ');
+    res.send('Error 400 - Please submit email and/or password');
   }
   else {
 
