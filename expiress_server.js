@@ -15,10 +15,9 @@ app.use((req, res, next) => {
 })
 
 function randomStr() {
-  const random = '';
+  let random = '';
   const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-  for (const i = 0; i < 6; i++)
+  for (let i = 0; i < 6; i++)
     random += possible.charAt(Math.floor(Math.random() * possible.length));
 
   return random;
@@ -28,6 +27,19 @@ function randomStr() {
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
+};
+
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
 };
 
 app.post("/urls", (req, res) => {
@@ -93,6 +105,22 @@ app.post("/logout", (req, res) => {
 
 app.get("/register", (req, res) => {
   res.render("register");
+})
+
+app.post("/register", (req, res) => {
+
+
+
+  const randomID = randomStr();
+  const email = req.body.email;
+  const password = req.body.password;
+  users[randomID] = {
+    id: randomID,
+    email: email,
+    password: password
+  };
+  res.cookie('id', randomID);
+  res.redirect("/urls");
 })
 
 
