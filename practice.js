@@ -12,12 +12,12 @@ const users = {
 };
 
 
-function emailCheck(input){
-  for(id in users){
-  if(users[id]['email'] === input){
-    return true;
+function passwordTest(email, pass){
+  for(user in users){
+    if(users[user]['email'] === email){
+      return(users[user]['password'] === pass)
     }
   } return false;
 }
 
-console.log(emailCheck('user@example.co'));
+console.log(passwordTest('user2@exampl.com', 'dishwasher-funk'));

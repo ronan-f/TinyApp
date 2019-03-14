@@ -9,8 +9,6 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
-
-
 function randomStr() {
   let random = '';
   const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -19,7 +17,6 @@ function randomStr() {
 
   return random;
 }
-
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -48,6 +45,14 @@ function emailCheck(input){
   for(id in users){
   if(users[id]['email'] === input){
     return true;
+    }
+  } return false;
+}
+
+function passwordTest(email, pass){
+  for(user in users){
+    if(users[user]['email'] === email){
+      return(users[user]['password'] === pass)
     }
   } return false;
 }
@@ -107,22 +112,38 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
+  const email = req.body.email;
+  const password = req.body.password;
+  const id = req.cookies.id;
+
+
+if(!emailCheck(email)){
+  res.status(403);
+  res.send('Error 403 - Email not found');
+} else if(!passwordTest(email, password)){
+  res.status(403);
+  res.send('Error 403 - Incorrect Password');
+} else {
+  res.cookie('id', users[user].id);
   res.redirect("/urls");
+  }
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username', req.body.username);
+  const id = req.cookies.id;
+  res.clearCookie('id', users[id].id);
   res.redirect("/urls");
-})
+});
 
 app.get("/register", (req, res) => {
   res.render("register");
+});
 
-})
+app.get("/login", (req, res) => {
+  res.render("login");
+});
 
 app.post("/register", (req, res) => {
-
 
   const randomID = randomStr();
   const email = req.body.email;
@@ -132,15 +153,12 @@ app.post("/register", (req, res) => {
   if(emailCheck(email)){
     res.status(400);
     res.send('Error 400 - Email is already registered');
-
   }
-
    else if(email === '' || password === ''){
     res.status(400);
     res.send('Error 400 - Please submit email and/or password');
   }
   else {
-
   users[randomID] = {
     id: randomID,
     email: email,
