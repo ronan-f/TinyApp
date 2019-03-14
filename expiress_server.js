@@ -79,14 +79,16 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  console.log("in urls")
   let templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
-    console.log(users[req.cookies.id]['email']);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  if(req.cookies.id){
+    res.render("urls_new");
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.get("/urls/:shortURL", (req, res) => {
