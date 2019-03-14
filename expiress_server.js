@@ -50,6 +50,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  console.log("in urls")
   let templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
@@ -82,11 +83,13 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+  console.log('post / login')
   res.cookie('username', req.body.username);
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
+  console.log("logout")
   res.clearCookie('username', req.body.username);
   res.redirect("/urls");
 })
@@ -95,8 +98,13 @@ app.get("/register", (req, res) => {
   res.render("register");
 })
 
+app.post("/register", (req, res) => {
+  console.log('WE are on post /register');
+})
+
 
 app.listen(PORT, () => {
+  console.log('connected to port', PORT);
 });
 
 
