@@ -9,10 +9,7 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
-app.use((req, res, next) => {
-  app.locals.username = req.cookies.username;
-  next();
-})
+
 
 function randomStr() {
   let random = '';
@@ -42,6 +39,11 @@ const users = {
   }
 };
 
+app.use((req, res, next) => {
+  app.locals.username = users[req.cookies.id];
+  next();
+})
+
 function emailCheck(input){
   for(id in users){
   if(users[id]['email'] === input){
@@ -56,6 +58,7 @@ app.post("/urls", (req, res) => {
   let short = randomStr();
   urlDatabase[short] = req.body.longURL;
   res.redirect('/urls/' + short);
+
 });
 
 app.get("/", (req, res) => {
@@ -73,6 +76,7 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
+    console.log(users[req.cookies.id]['email']);
 });
 
 app.get("/urls/new", (req, res) => {
@@ -114,6 +118,7 @@ app.post("/logout", (req, res) => {
 
 app.get("/register", (req, res) => {
   res.render("register");
+
 })
 
 app.post("/register", (req, res) => {
@@ -122,7 +127,6 @@ app.post("/register", (req, res) => {
   const randomID = randomStr();
   const email = req.body.email;
   const password = req.body.password;
-
   const emailFunc = emailCheck(email);
 
   if(emailCheck(email)){
