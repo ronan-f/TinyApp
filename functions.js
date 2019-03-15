@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
   i3BoGr: { longURL: "https://www.google.ca", userID: "userRandomID" }
@@ -7,12 +9,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "hello"
+    password: "$2b$10$wk.c0CZlyyOWdRaEo1FUCOArEgPRTFwjRJBk0ri7lmfF7m/JAuBvi"
   },
  "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: "$2b$10$wk.c0CZlyyOWdRaEo1FUCOArEgPRTFwjRJBk0ri7lmfF7m/JAuBvi"
   }
 };
 
@@ -46,8 +48,8 @@ exports.emailCheck = function (input){
 
 exports.passwordTest = function (email, pass){
   for(user in users){
-    if(users[user]['email'] === email){
-      return(users[user]['password'], pass );
+    if(users[user]['email'] === email && bcrypt.compareSync(pass, users[user]['password'])){
+      return true;
     }
   } return false;
 }

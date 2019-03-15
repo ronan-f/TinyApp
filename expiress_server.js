@@ -27,7 +27,7 @@ app.post("/urls", (req, res) => {
 
 app.get("/", (req, res) => {
   if(req.session.id){
-    res.redirect("/urls");
+    res.redirect("/urls"); //if logged in send to /urls
   } else {
   res.redirect("/login");
   }
@@ -46,7 +46,6 @@ app.get("/urls", (req, res) => {
     urls: functions.urlsForUser(req.session.id),
     ID: req.session.id
   };
-
   if(req.session.id){
     res.render("urls_index", templateVars);
   } else {
@@ -64,21 +63,24 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-
-  for(keys in functions.urlDatabase){
+  for(keys in functions.urlDatabase){ //check if shortURL exists in database. If not send error message
     if(shortURL === keys){
+      found = true;
       let longURL = functions.urlDatabase[shortURL].longURL;
       let templateVars = { shortURL: shortURL, longURL: longURL};
       if(req.session.id === functions.urlDatabase[shortURL].userID){
-      res.render("urls_show", templateVars);
-    } else if(req.session.id){
-      res.render('urlNotYours')
-    } else {
-      res.render("notLoggedIn");
-    }
+      return res.render("urls_show", templateVars);
 
+      } else if(req.session.id){
+        return res.render('urlNotYours')
+      } else {
+        return res.render("notLoggedIn");
+      }
     }
-  } res.render("urlNotFound");
+  }
+
+    res.render("urlNotFound");
+
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -94,7 +96,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   let shortURL = req.params.shortURL;
-  if(req.session.id === functions.urlDatabase[shortURL].userID){
+  if(req.session.id === functions.urlDatabase[shortURL].userID){ //check if cookies matches the ID in user database
     delete functions.urlDatabase[shortURL];
     res.redirect("/urls");
   } else if(req.session.id){
@@ -114,15 +116,12 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
   const id = req.session.id;
 
-  console.log()
-
-
 if(!functions.emailCheck(email)){
   res.status(403);
-  res.send('Error 403 - Email not found');
+  res.render('error403');
 } else if(!functions.passwordTest(email, password)){
   res.status(403);
-  res.send('Error 403 - Incorrect Password');
+  res.render('error403');
 } else {
   req.session.id = functions.users[user].id;
   res.redirect("/urls");
@@ -132,15 +131,24 @@ if(!functions.emailCheck(email)){
 app.post("/logout", (req, res) => {
   const id = req.session.id;
   req.session = null;
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 app.get("/register", (req, res) => {
-  res.render("register");
+  if(req.session.id){
+    res.redirect("/urls");
+  } else {
+    res.render("register");
+  }
+
 });
 
 app.get("/login", (req, res) => {
+  if(req.session.id){
+    res.redirect("/urls");
+  }else{
   res.render("login");
+  }
 });
 
 app.post("/register", (req, res) => {
@@ -153,11 +161,11 @@ app.post("/register", (req, res) => {
 
   if(functions.emailCheck(email)){
     res.status(400);
-    res.send('Error 400 - Email is already registered');
+    res.render('registerFail');
   }
    else if(email === '' || password === ''){
     res.status(400);
-    res.send('Error 400 - Please submit email and/or password');
+    res.render('registerFail');
   }
   else {
   functions.users[randomID] = {
