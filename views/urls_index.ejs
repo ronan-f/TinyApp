@@ -12,13 +12,14 @@
 
 <% include ./partials/_header.ejs %>
 
-<a href="#">Generate your tiny URL</a>
+<a href="/urls/new">Generate your tiny URL</a>
 
 <h1>My URLs</h1>
 
 <ul>
 
       <% for(let keys in urls) { %>
+
     <form method="POST" action="/urls/<%=keys%>/delete">
     <li> <strong> <%= keys + ':' %> </strong> <%= urls[keys] %>
     <a href="/urls/<%=keys%>">Edit</a>
