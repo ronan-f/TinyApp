@@ -4,6 +4,7 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+const functions = require("./functions");
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -13,74 +14,27 @@ app.use(cookieSession({
   keys: ['5d41402abc4b2a76b9719d911017c592'],
 }));
 
-function randomStr() {
-  let random = '';
-  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < 6; i++)
-    random += possible.charAt(Math.floor(Math.random() * possible.length));
-  return random;
-}
-
-const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "userRandomID" }
-};
-
-const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "hello"
-  },
- "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  }
-};
-
 app.use((req, res, next) => {
-  app.locals.username = users[req.session.id];
+  app.locals.username = functions.users[req.session.id];
   next();
 })
 
-function urlsForUser(id){
-  urls = {};
-  for (keys in urlDatabase){
-    if (urlDatabase[keys].userID === id){
-      urls[keys] = urlDatabase[keys].longURL;
-    }
-  } return(urls);
-}
-
-function emailCheck(input){
-  for(id in users){
-  if(users[id]['email'] === input){
-    return true;
-    }
-  } return false;
-}
-
-function passwordTest(email, pass){
-  for(user in users){
-    if(users[user]['email'] === email){
-      return(users[user]['password'], pass );
-    }
-  } return false;
-}
-
 app.post("/urls", (req, res) => {
-  const short = randomStr();
-  urlDatabase[short] = {longURL: req.body.longURL, userID: req.session.id};
+  const short = functions.randomString();
+  functions.urlDatabase[short] = {longURL: req.body.longURL, userID: req.session.id};
   res.redirect('/urls/' + short);
 });
 
 app.get("/", (req, res) => {
-  res.redirect("/urls");
+  if(req.session.id){
+    res.redirect("/urls");
+  } else {
+  res.redirect("/login");
+  }
 });
 
 app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+  res.json(functions.urlDatabase);
 });
 
 app.get("/hello", (req, res) => {
@@ -88,14 +42,15 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlsForUser(req.session.id),
-                        ID: req.session.id
-                      };
+  let templateVars = {
+    urls: functions.urlsForUser(req.session.id),
+    ID: req.session.id
+  };
 
   if(req.session.id){
     res.render("urls_index", templateVars);
   } else {
-    res.redirect('/login');
+    res.render("notLoggedIn");
   }
 });
 
@@ -109,38 +64,48 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  let longURL = urlDatabase[shortURL].longURL;
-  let templateVars = { shortURL: shortURL, longURL: longURL};
 
-  if(req.session.id === urlDatabase[shortURL].userID){
-    res.render("urls_show", templateVars);
-  } else if(req.session.id){
-    res.send('This URL does not belong to you!!!')
-  } else {
-    res.redirect("/login");
-  }
+  for(keys in functions.urlDatabase){
+    if(shortURL === keys){
+      let longURL = functions.urlDatabase[shortURL].longURL;
+      let templateVars = { shortURL: shortURL, longURL: longURL};
+      if(req.session.id === functions.urlDatabase[shortURL].userID){
+      res.render("urls_show", templateVars);
+    } else if(req.session.id){
+      res.render('urlNotYours')
+    } else {
+      res.render("notLoggedIn");
+    }
+
+    }
+  } res.render("urlNotFound");
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
+  const shortURL = req.params.shortURL;
+  for(keys in functions.urlDatabase){
+    if (shortURL === keys){
+      const longURL = functions.urlDatabase[req.params.shortURL].longURL;
+      res.redirect(longURL);
+    }
+  } res.render("urlNotFound");
+
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   let shortURL = req.params.shortURL;
-  if(req.session.id === urlDatabase[shortURL].userID){
-    delete urlDatabase[shortURL];
+  if(req.session.id === functions.urlDatabase[shortURL].userID){
+    delete functions.urlDatabase[shortURL];
     res.redirect("/urls");
   } else if(req.session.id){
     res.redirect("/urls");
   } else {
     res.redirect("/login");
   }
-
 });
 
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.update;
+  functions.urlDatabase[req.params.id]['longURL'] = req.body.update;
   res.redirect("/urls");
 });
 
@@ -152,21 +117,21 @@ app.post("/login", (req, res) => {
   console.log()
 
 
-if(!emailCheck(email)){
+if(!functions.emailCheck(email)){
   res.status(403);
   res.send('Error 403 - Email not found');
-} else if(!passwordTest(email, password)){
+} else if(!functions.passwordTest(email, password)){
   res.status(403);
   res.send('Error 403 - Incorrect Password');
 } else {
-  req.session.id = users[user].id;
+  req.session.id = functions.users[user].id;
   res.redirect("/urls");
   }
 });
 
 app.post("/logout", (req, res) => {
   const id = req.session.id;
-  req.session.id = null;
+  req.session = null;
   res.redirect("/urls");
 });
 
@@ -180,13 +145,13 @@ app.get("/login", (req, res) => {
 
 app.post("/register", (req, res) => {
 
-  const randomID = randomStr();
+  const randomID = functions.randomString();
   const email = req.body.email;
   const password = req.body.password;
   const hashedPass = bcrypt.hashSync(password, 10);
-  const emailFunc = emailCheck(email);
+  const emailFunc = functions.emailCheck(email);
 
-  if(emailCheck(email)){
+  if(functions.emailCheck(email)){
     res.status(400);
     res.send('Error 400 - Email is already registered');
   }
@@ -195,7 +160,7 @@ app.post("/register", (req, res) => {
     res.send('Error 400 - Please submit email and/or password');
   }
   else {
-  users[randomID] = {
+  functions.users[randomID] = {
     id: randomID,
     email: email,
     password: hashedPass

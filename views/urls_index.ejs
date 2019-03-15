@@ -12,7 +12,7 @@
 
 <% include ./partials/_header.ejs %>
 
-<a href="/urls/new">Generate your tiny URL</a>
+<a href="/urls/new">Create a new short link</a>
 
 <h1>My URLs</h1>
 
@@ -22,10 +22,14 @@
 
     <form method="POST" action="/urls/<%=keys%>/delete">
     <li> <strong> <%= keys + ':' %> </strong> <%= urls[keys] %>
-    <a href="/urls/<%=keys%>">Edit</a>
-    <button type="submit" class="btn btn-primary">Delete</button> </li>
+    <a href="/u/<%=keys%>" class="btn btn-success">Go to URL</a>
+    <a href="/urls/<%=keys%>" class="btn btn-info">Edit</a>
+    <button type="submit" class="btn btn-danger">Delete</button> </li>
+
     </form>
 <% }; %>
+
+
 
 
 
