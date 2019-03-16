@@ -88,9 +88,9 @@ app.get("/u/:shortURL", (req, res) => {
   for(keys in functions.urlDatabase){
     if (shortURL === keys){
       const longURL = functions.urlDatabase[req.params.shortURL].longURL;
-      res.redirect(longURL);
+      return res.redirect(longURL);
     }
-  } res.render("urlNotFound");
+  } return res.render("urlNotFound");
 
 });
 
