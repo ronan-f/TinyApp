@@ -78,9 +78,7 @@ app.get("/urls/:shortURL", (req, res) => {
       }
     }
   }
-
     res.render("urlNotFound");
-
 });
 
 app.get("/u/:shortURL", (req, res) => {
