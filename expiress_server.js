@@ -17,9 +17,9 @@ app.use(cookieSession({
 app.use((req, res, next) => {
   app.locals.username = functions.users[req.session.id];
   next();
-})
+});
 
-app.post("/urls", (req, res) => {
+app.post("/urls", (req, res) => { //Add new URL to database
   const short = functions.randomString();
   functions.urlDatabase[short] = {longURL: req.body.longURL, userID: req.session.id};
   res.redirect('/urls/' + short);
@@ -27,13 +27,13 @@ app.post("/urls", (req, res) => {
 
 app.get("/", (req, res) => {
   if(req.session.id){
-    res.redirect("/urls"); //if logged in send to /urls
+    res.redirect("/urls");
   } else {
   res.redirect("/login");
   }
 });
 
-app.get("/urls.json", (req, res) => {
+app.get("/urls.json", (req, res) => { // show .json database
   res.json(functions.urlDatabase);
 });
 
@@ -41,7 +41,7 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-app.get("/urls", (req, res) => {
+app.get("/urls", (req, res) => { //display URLs if logged in
   let templateVars = {
     urls: functions.urlsForUser(req.session.id),
     ID: req.session.id
@@ -53,7 +53,7 @@ app.get("/urls", (req, res) => {
   }
 });
 
-app.get("/urls/new", (req, res) => {
+app.get("/urls/new", (req, res) => { //displays HTML to add new URL
   if(req.session.id){
     res.render("urls_new");
   } else {
@@ -61,7 +61,7 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-app.get("/urls/:shortURL", (req, res) => {
+app.get("/urls/:shortURL", (req, res) => { //Used to edit or delete URLs from database
   let shortURL = req.params.shortURL;
   for(keys in functions.urlDatabase){ //check if shortURL exists in database. If not send error message
     if(shortURL === keys){
@@ -81,7 +81,7 @@ app.get("/urls/:shortURL", (req, res) => {
     res.render("urlNotFound");
 });
 
-app.get("/u/:shortURL", (req, res) => {
+app.get("/u/:shortURL", (req, res) => { // redirect to the long URL
   const shortURL = req.params.shortURL;
   for(keys in functions.urlDatabase){
     if (shortURL === keys){
@@ -92,7 +92,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.post("/urls/:shortURL/delete", (req, res) => { //Deletes URL from database
   let shortURL = req.params.shortURL;
   if(req.session.id === functions.urlDatabase[shortURL].userID){ //check if cookies matches the ID in user database
     delete functions.urlDatabase[shortURL];
@@ -104,12 +104,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   }
 });
 
-app.post("/urls/:id", (req, res) => {
+app.post("/urls/:id", (req, res) => { //Add URL to URL database
   functions.urlDatabase[req.params.id]['longURL'] = req.body.update;
   res.redirect("/urls");
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", (req, res) => { //User input to login and view URLs
   const email = req.body.email;
   const password = req.body.password;
   const id = req.session.id;
@@ -126,22 +126,21 @@ if(!functions.emailCheck(email)){
   }
 });
 
-app.post("/logout", (req, res) => {
+app.post("/logout", (req, res) => { //clear cookies and logout
   const id = req.session.id;
   req.session = null;
   res.redirect("/login");
 });
 
-app.get("/register", (req, res) => {
+app.get("/register", (req, res) => { // sign up for account
   if(req.session.id){
     res.redirect("/urls");
   } else {
     res.render("register");
   }
-
 });
 
-app.get("/login", (req, res) => {
+app.get("/login", (req, res) => { // check to see if logged in then redirect accordingly
   if(req.session.id){
     res.redirect("/urls");
   }else{
@@ -149,7 +148,7 @@ app.get("/login", (req, res) => {
   }
 });
 
-app.post("/register", (req, res) => {
+app.post("/register", (req, res) => { //posts new user to users database
 
   const randomID = functions.randomString();
   const email = req.body.email;
